@@ -1,0 +1,110 @@
+Input-Ablation Experiments: which spectral properties does the CNN need?
+========================================================================
+5 independent runs (seeds) x stratified 5-fold CV x 200 epochs, architecture and
+hyperparameters identical to the CNN validation. Only the input transform differs between conditions.
+Transforms are applied to all molecules before splitting, so training and test spectra are transformed alike.
+
+INFERENCE: on the across-seed paired difference (control minus ablation). A property is called necessary
+if the two-sided 95% t CI of that difference over seeds excludes zero. Fold-to-fold spread within a single
+run is NOT used as the error term -- folds are not independently trained conditions.
+
+=== pairwise: BODIPY 4/10, 1200 molecules per run, chance = 0.500 ===
+
+Transform diagnostics (seed 1; residual spread of each property AFTER the transform):
+  condition             peak sd (nm)  FWHM sd (nm)  centroid sd (nm) clamped
+  identity              7.36          12.65         5.19            0.0%
+  const_shift           7.37          13.40         5.15            1.8%
+  peak_align            0.91          12.12         4.20            3.9%
+  centroid_align        5.19          12.88         0.95            3.1%
+  const_scale           7.27          12.13         5.40            11.8%
+  width_norm            7.22          4.57          5.00            9.5%
+  shoulder_remove       7.38          16.70         5.28            0.0%
+  const_both            7.25          12.06         5.46            9.3%
+  align_width           1.51          4.22          5.83            10.3%
+  align_width_shoulder  1.51          5.37          5.84            10.3%
+  (Note that peak_align leaves centroid variation behind: equalizing the peak maximum is not the
+   same as equalizing whole-band position, which centroid_align addresses separately.)
+
+Accuracy per condition (mean over 5 folds, then mean +/- sd over 5 seeds):
+  condition             accuracy             description
+  identity              0.743 +/- 0.011        unmodified spectra (baseline)
+  const_shift           0.751 +/- 0.021        RESAMPLING CONTROL for the alignment ablations (same shift for every molecule)
+  peak_align            0.734 +/- 0.009        ABLATION: peak-maximum wavelength equalized
+  centroid_align        0.746 +/- 0.016        ABLATION: whole-band position equalized (intensity-weighted mean wavelength)
+  const_scale           0.744 +/- 0.013        RESAMPLING CONTROL for width_norm (same width factor for every molecule)
+  width_norm            0.717 +/- 0.015        ABLATION: FWHM equalized about each molecule's own peak
+  shoulder_remove       0.730 +/- 0.017        ABLATION: shoulder removed (640-680 nm replaced by a straight line)
+  const_both            0.737 +/- 0.009        RESAMPLING CONTROL for the cumulative ablations (same shift and width factor for every molecule)
+  align_width           0.666 +/- 0.018        CUMULATIVE ABLATION: peak maximum AND FWHM both equalized
+  align_width_shoulder  0.646 +/- 0.028        CUMULATIVE ABLATION: peak maximum, FWHM AND shoulder all removed
+
+Verdicts: across-seed paired difference (control minus ablation), n = 5 runs, 95% t CI:
+  peak_align            vs const_shift   diff +0.018  95% CI [+0.003, +0.033]  -> peak-maximum wavelength is NECESSARY
+                           per-seed differences: +0.019 +0.028 +0.018 +0.025 -0.002
+  centroid_align        vs const_shift   diff +0.005  95% CI [-0.012, +0.022]  -> whole-band position (centroid) is not resolvable
+                           per-seed differences: -0.008 +0.021 -0.000 +0.018 -0.005
+  width_norm            vs const_scale   diff +0.028  95% CI [+0.013, +0.042]  -> FWHM is NECESSARY
+                           per-seed differences: +0.021 +0.018 +0.046 +0.032 +0.021
+  shoulder_remove       vs identity      diff +0.014  95% CI [-0.006, +0.033]  -> shoulder is not resolvable
+                           per-seed differences: +0.018 +0.013 -0.008 +0.008 +0.036
+  align_width           vs const_both    diff +0.070  95% CI [+0.046, +0.095]  -> peak maximum + FWHM jointly is NECESSARY
+                           per-seed differences: +0.080 +0.085 +0.059 +0.041 +0.087
+  align_width_shoulder  vs const_both    diff +0.091  95% CI [+0.059, +0.122]  -> peak maximum + FWHM + shoulder jointly is NECESSARY
+                           per-seed differences: +0.097 +0.088 +0.071 +0.068 +0.131
+
+Above-chance margin: 0.243 unmodified -> 0.146 after removing peak maximum, FWHM and shoulder (60% retained).
+  This retained fraction is an UPPER BOUND on performance independent of the transformed properties:
+  residual peak, FWHM and centroid variation survives each transform (see the diagnostics above), so the
+  retained accuracy may still be drawing on the very properties the transform was meant to remove. It
+  CANNOT be apportioned to unidentified spectral structure.
+
+=== triplet: BODIPY 2/11/13, 1830 molecules per run, chance = 0.333 ===
+
+Transform diagnostics (seed 1; residual spread of each property AFTER the transform):
+  condition             peak sd (nm)  FWHM sd (nm)  centroid sd (nm) clamped
+  identity              8.37          17.18         5.82            0.0%
+  const_shift           8.22          17.97         5.74            1.8%
+  peak_align            1.03          16.51         3.79            3.8%
+  centroid_align        5.10          17.41         1.03            3.4%
+  const_scale           8.17          15.58         6.10            14.7%
+  width_norm            8.26          5.09          5.46            11.7%
+  shoulder_remove       8.58          20.81         5.93            0.0%
+  const_both            8.28          15.39         6.16            13.0%
+  align_width           1.82          4.84          6.23            11.8%
+  align_width_shoulder  1.82          6.65          6.19            11.8%
+  (Note that peak_align leaves centroid variation behind: equalizing the peak maximum is not the
+   same as equalizing whole-band position, which centroid_align addresses separately.)
+
+Accuracy per condition (mean over 5 folds, then mean +/- sd over 5 seeds):
+  condition             accuracy             description
+  identity              0.732 +/- 0.009        unmodified spectra (baseline)
+  const_shift           0.727 +/- 0.015        RESAMPLING CONTROL for the alignment ablations (same shift for every molecule)
+  peak_align            0.704 +/- 0.009        ABLATION: peak-maximum wavelength equalized
+  centroid_align        0.711 +/- 0.010        ABLATION: whole-band position equalized (intensity-weighted mean wavelength)
+  const_scale           0.727 +/- 0.014        RESAMPLING CONTROL for width_norm (same width factor for every molecule)
+  width_norm            0.720 +/- 0.012        ABLATION: FWHM equalized about each molecule's own peak
+  shoulder_remove       0.723 +/- 0.015        ABLATION: shoulder removed (640-680 nm replaced by a straight line)
+  const_both            0.723 +/- 0.015        RESAMPLING CONTROL for the cumulative ablations (same shift and width factor for every molecule)
+  align_width           0.647 +/- 0.014        CUMULATIVE ABLATION: peak maximum AND FWHM both equalized
+  align_width_shoulder  0.642 +/- 0.015        CUMULATIVE ABLATION: peak maximum, FWHM AND shoulder all removed
+
+Verdicts: across-seed paired difference (control minus ablation), n = 5 runs, 95% t CI:
+  peak_align            vs const_shift   diff +0.023  95% CI [+0.010, +0.036]  -> peak-maximum wavelength is NECESSARY
+                           per-seed differences: +0.020 +0.028 +0.009 +0.037 +0.022
+  centroid_align        vs const_shift   diff +0.016  95% CI [+0.006, +0.025]  -> whole-band position (centroid) is NECESSARY
+                           per-seed differences: +0.016 +0.016 +0.004 +0.026 +0.016
+  width_norm            vs const_scale   diff +0.007  95% CI [-0.001, +0.015]  -> FWHM is not resolvable
+                           per-seed differences: +0.004 +0.015 +0.002 +0.013 +0.001
+  shoulder_remove       vs identity      diff +0.009  95% CI [+0.001, +0.017]  -> shoulder is NECESSARY
+                           per-seed differences: +0.014 +0.010 +0.014 -0.002 +0.009
+  align_width           vs const_both    diff +0.076  95% CI [+0.060, +0.092]  -> peak maximum + FWHM jointly is NECESSARY
+                           per-seed differences: +0.063 +0.090 +0.074 +0.090 +0.064
+  align_width_shoulder  vs const_both    diff +0.081  95% CI [+0.055, +0.108]  -> peak maximum + FWHM + shoulder jointly is NECESSARY
+                           per-seed differences: +0.072 +0.073 +0.090 +0.114 +0.057
+
+Above-chance margin: 0.399 unmodified -> 0.309 after removing peak maximum, FWHM and shoulder (77% retained).
+  This retained fraction is an UPPER BOUND on performance independent of the transformed properties:
+  residual peak, FWHM and centroid variation survives each transform (see the diagnostics above), so the
+  retained accuracy may still be drawing on the very properties the transform was meant to remove. It
+  CANNOT be apportioned to unidentified spectral structure.
+

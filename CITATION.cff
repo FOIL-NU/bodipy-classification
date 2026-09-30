@@ -1,0 +1,70 @@
+cff-version: 1.2.0
+type: software
+message: >-
+  If you use this software, please cite it using the metadata below. The
+  manuscript it accompanies is currently under review; once that article is
+  published, add its journal, year, volume/pages and doi to the
+  preferred-citation block and citations will resolve to the article instead.
+title: >-
+  Code for: Photoactivatable BODIPYs for Simultaneous Spectral Single-Molecule
+  Discrimination
+authors:
+  - given-names: Wei-Hong
+    family-names: Yeo
+  - given-names: Yeting
+    family-names: Zheng
+  - given-names: Andrea
+    family-names: Tomassini
+  - given-names: Yunshu
+    family-names: Liu
+  - given-names: Md Abul
+    family-names: Shahid
+  - given-names: Ambarish Kumar
+    family-names: Singh
+  - given-names: Colin E.
+    family-names: Hayter
+  - given-names: Xiayi
+    family-names: Gong
+  - given-names: Hao F.
+    family-names: Zhang
+  - given-names: Yang
+    family-names: Zhang
+  - given-names: Francisco M.
+    family-names: Raymo
+    # TODO: add ORCIDs where available, e.g.:
+    # orcid: 'https://orcid.org/0000-0000-0000-0000'
+repository-code: 'https://github.com/FOIL-NU/bodipy-classification'
+license: MIT
+preferred-citation:
+  type: article
+  title: >-
+    Photoactivatable BODIPYs for Simultaneous Spectral Single-Molecule
+    Discrimination
+  authors:
+    - given-names: Wei-Hong
+      family-names: Yeo
+    - given-names: Yeting
+      family-names: Zheng
+    - given-names: Andrea
+      family-names: Tomassini
+    - given-names: Yunshu
+      family-names: Liu
+    - given-names: Md Abul
+      family-names: Shahid
+    - given-names: Ambarish Kumar
+      family-names: Singh
+    - given-names: Colin E.
+      family-names: Hayter
+    - given-names: Xiayi
+      family-names: Gong
+    - given-names: Hao F.
+      family-names: Zhang
+    - given-names: Yang
+      family-names: Zhang
+    - given-names: Francisco M.
+      family-names: Raymo
+  status: submitted
+  # journal, year, volume, pages and doi are deliberately absent: the article
+  # is under review, so no correct value exists yet. Add them here once it is
+  # published -- do not substitute placeholders, which citation managers would
+  # ingest as if they were real.

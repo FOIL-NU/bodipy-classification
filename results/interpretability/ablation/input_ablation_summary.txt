@@ -1,0 +1,98 @@
+Input-Ablation Experiments: which spectral properties does the CNN need?
+========================================================================
+5 independent runs x stratified 5-fold CV x 200 epochs; architecture and hyperparameters
+identical to the CNN validation. Only the input transform differs between conditions.
+Reference-constant mode: trainfold.
+  Each fold's common reference constants are computed from that fold's TRAINING molecules only and
+  applied to both its training and test data, so no held-out covariate defines the transformation.
+
+INFERENCE: across-seed paired difference (control minus ablation), two-sided 95% t CI, n = runs.
+Fold spread within a run is NOT the error term. Holm-Bonferroni correction is applied within each of
+two pre-specified families: the 8 single-property contrasts, and the 4 cumulative contrasts.
+
+WHAT A NONZERO CONTRAST MEANS: the feature-targeting TRANSFORMATION causes a measurable accuracy loss.
+No transform is perfectly selective (shoulder removal alters FWHM; the cumulative transform increases
+centroid spread), so a contrast does not isolate the targeted property as uniquely responsible.
+
+=== pairwise: BODIPY 4/10, 1200 molecules per run, chance = 0.500 ===
+
+Transform diagnostics (seed 1 fold 1; residual spread of each property AFTER the transform):
+  condition             peak sd (nm)  FWHM sd (nm)  centroid sd (nm) clamped
+  identity              7.36          12.65         5.19            0.0%
+  const_shift           7.37          13.40         5.15            1.8%
+  peak_align            0.91          12.12         4.20            3.9%
+  centroid_align        5.17          12.84         0.94            3.1%
+  const_scale           7.28          12.15         5.39            11.3%
+  width_norm            7.22          4.59          5.00            9.6%
+  shoulder_remove       7.38          16.70         5.28            0.0%
+  const_both            7.25          12.05         5.45            9.3%
+  align_width           1.49          4.24          5.83            10.4%
+  align_width_shoulder  1.49          5.25          5.84            10.4%
+  Note: peak_align leaves centroid spread largely intact, and shoulder_remove changes FWHM. Read each
+  contrast against the row showing what its transform actually moved.
+
+Accuracy (mean over 5 folds, then mean +/- sd over 5 runs):
+  identity              0.744 +/- 0.006        unmodified spectra (baseline)
+  const_shift           0.753 +/- 0.016        RESAMPLING CONTROL for the alignment transforms (same shift for every molecule)
+  peak_align            0.736 +/- 0.019        targets the peak-maximum wavelength
+  centroid_align        0.740 +/- 0.009        targets whole-band position (intensity-weighted mean wavelength)
+  const_scale           0.743 +/- 0.012        RESAMPLING CONTROL for width_norm (same width factor for every molecule)
+  width_norm            0.712 +/- 0.012        targets FWHM, a width proxy, about each molecule's own peak
+  shoulder_remove       0.742 +/- 0.012        targets the shoulder (640-680 nm replaced by a straight line)
+  const_both            0.742 +/- 0.012        RESAMPLING CONTROL for the cumulative transforms (same shift and width factor for every molecule)
+  align_width           0.676 +/- 0.023        CUMULATIVE: peak maximum AND FWHM both targeted
+  align_width_shoulder  0.645 +/- 0.025        CUMULATIVE: peak maximum, FWHM AND shoulder all targeted
+
+=== triplet: BODIPY 2/11/13, 1830 molecules per run, chance = 0.333 ===
+
+Transform diagnostics (seed 1 fold 1; residual spread of each property AFTER the transform):
+  condition             peak sd (nm)  FWHM sd (nm)  centroid sd (nm) clamped
+  identity              8.37          17.18         5.82            0.0%
+  const_shift           8.22          17.97         5.74            1.8%
+  peak_align            1.03          16.51         3.79            3.8%
+  centroid_align        5.10          17.42         1.04            3.4%
+  const_scale           8.16          15.59         6.10            14.8%
+  width_norm            8.26          5.19          5.46            11.6%
+  shoulder_remove       8.58          20.81         5.93            0.0%
+  const_both            8.28          15.37         6.17            13.2%
+  align_width           1.83          4.84          6.24            11.8%
+  align_width_shoulder  1.83          6.71          6.19            11.8%
+  Note: peak_align leaves centroid spread largely intact, and shoulder_remove changes FWHM. Read each
+  contrast against the row showing what its transform actually moved.
+
+Accuracy (mean over 5 folds, then mean +/- sd over 5 runs):
+  identity              0.734 +/- 0.014        unmodified spectra (baseline)
+  const_shift           0.730 +/- 0.016        RESAMPLING CONTROL for the alignment transforms (same shift for every molecule)
+  peak_align            0.702 +/- 0.010        targets the peak-maximum wavelength
+  centroid_align        0.711 +/- 0.011        targets whole-band position (intensity-weighted mean wavelength)
+  const_scale           0.725 +/- 0.014        RESAMPLING CONTROL for width_norm (same width factor for every molecule)
+  width_norm            0.718 +/- 0.012        targets FWHM, a width proxy, about each molecule's own peak
+  shoulder_remove       0.730 +/- 0.009        targets the shoulder (640-680 nm replaced by a straight line)
+  const_both            0.725 +/- 0.011        RESAMPLING CONTROL for the cumulative transforms (same shift and width factor for every molecule)
+  align_width           0.647 +/- 0.014        CUMULATIVE: peak maximum AND FWHM both targeted
+  align_width_shoulder  0.636 +/- 0.016        CUMULATIVE: peak maximum, FWHM AND shoulder all targeted
+
+SINGLE-PROPERTY CONTRASTS (family of 8, Holm-corrected):
+  case       targeted property                diff      95% CI                 p         p_Holm    verdict at Holm 0.05
+  pairwise   peak-maximum wavelength          +0.017    [-0.006, +0.039]    0.1076    0.3991    not resolvable after correction
+  pairwise   whole-band position (centroid)   +0.013    [-0.004, +0.029]    0.0998    0.3991    not resolvable after correction
+  pairwise   FWHM (width proxy)               +0.030    [+0.016, +0.045]    0.0042    0.0305    transformation causes a measurable loss
+  pairwise   shoulder                         +0.003    [-0.006, +0.012]    0.4400    0.4976    not resolvable after correction
+  triplet    peak-maximum wavelength          +0.028    [+0.015, +0.041]    0.0038    0.0305    transformation causes a measurable loss
+  triplet    whole-band position (centroid)   +0.019    [+0.009, +0.028]    0.0057    0.0340    transformation causes a measurable loss
+  triplet    FWHM (width proxy)               +0.007    [+0.001, +0.013]    0.0258    0.1288    not resolvable after correction
+  triplet    shoulder                         +0.003    [-0.004, +0.010]    0.2488    0.4976    not resolvable after correction
+
+CUMULATIVE CONTRASTS (family of 4, Holm-corrected):
+  case       targeted properties              diff      95% CI                 p         p_Holm    verdict at Holm 0.05
+  pairwise   peak maximum + FWHM jointly      +0.066    [+0.039, +0.093]    0.0026    0.0026    transformation causes a measurable loss
+  pairwise   peak maximum + FWHM + shoulder jointly +0.098    [+0.069, +0.127]    0.0007    0.0015    transformation causes a measurable loss
+  triplet    peak maximum + FWHM jointly      +0.078    [+0.059, +0.098]    0.0004    0.0012    transformation causes a measurable loss
+  triplet    peak maximum + FWHM + shoulder jointly +0.090    [+0.070, +0.110]    0.0002    0.0009    transformation causes a measurable loss
+
+pairwise: above-chance margin 0.244 unmodified -> 0.145 after the fullest transform (59% retained).
+triplet: above-chance margin 0.400 unmodified -> 0.302 after the fullest transform (76% retained).
+  This retained fraction is an UPPER BOUND on performance independent of the targeted properties.
+  Residual peak, FWHM and centroid variation survives every transform, so the retained accuracy may
+  still draw on the properties the transform was meant to remove. It CANNOT be apportioned to
+  unidentified spectral structure.

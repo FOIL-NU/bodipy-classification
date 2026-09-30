@@ -1,0 +1,12 @@
+Pairwise CNN Classification - Acquisition-File-Grouped CV
+===========================================================
+
+Folds are held-out ACQUISITION FILES, not individual molecules.
+k = min(5, min(n_files_dye1, n_files_dye2)), floor 2.
+
+ 1-13   k=3 (3 usable)   Acc=0.800+/-0.074   Prec=0.771+/-0.100   Rec=0.830+/-0.040   F1=0.768+/-0.109
+ 6-7    SKIPPED (grouping unavailable or insufficient samples; n_files=5/8)
+ 2-11   SKIPPED (grouping unavailable or insufficient samples; n_files=4/5)
+ 1-2    k=3 (3 usable)   Acc=0.482+/-0.100   Prec=0.604+/-0.050   Rec=0.600+/-0.106   F1=0.430+/-0.126
+ 4-10   SKIPPED (grouping unavailable or insufficient samples; n_files=5/5)
+ 3-5    SKIPPED (grouping unavailable or insufficient samples; n_files=0/6)

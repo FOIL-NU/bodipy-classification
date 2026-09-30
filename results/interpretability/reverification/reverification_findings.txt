@@ -1,0 +1,89 @@
+CNN Interpretability Re-Verification -- Final Summary
+=======================================================
+(Peak criterion used throughout: argmax over rows of |mean activation|,
+i.e. absolute value, NOT signed/raw max. This differs from the original
+cnn_weight_analysis.m script, which used raw signed max -- see "Why the
+794 nm claim does not survive" below for why this matters.)
+
+WAVELENGTH AXIS
+---------------
+Spectral bands (rows): 55, identical for both networks (conv uses
+'same' padding, so activation-map height == input height).
+Pairwise network wavelength range:  599.69 - 800.57 nm
+Triplet  network wavelength range:  599.67 - 800.70 nm
+Sampling interval: mean ~3.72 nm, std ~1.19 nm -- NOT perfectly uniform;
+report as "~3.7 nm average spacing," not a fixed-step grid.
+Row-to-wavelength mapping: wavelength(row r) = wl(r) directly (identity
+map, since H_out = H_in = 55).
+Padding fact (3x3 kernel, 'same' padding): only row 1 and row 55 receive
+a zero-padded neighbor. Row 54 (794.2/794.3 nm) is computed entirely
+from real rows 53, 54, 55 and is NOT a boundary row.
+
+BOUNDARY-PEAKING FILTERS (|activation| criterion)
+--------------------------------------------------
+Pairwise (BODIPY-4 vs 10): 2 of 16
+  Filter 13: row 1 (599.7 nm), |peak| = 109.93, rank 14 of 16 by |peak| -- low.
+  Filter 15: row 1 (599.7 nm), |peak| =  71.42, rank 15 of 16 by |peak| -- low.
+Triplet (BODIPY-2/11/13): 1 of 16
+  Filter 9: row 55 (800.7 nm), |peak| = 163.47, rank 8 of 16 by |peak| -- MID-PACK,
+  not clearly "low." This is weaker support than the pairwise case for the
+  claim "neither was among the highest-activation filters" -- flag this
+  explicitly for the triplet network rather than reusing the pairwise wording.
+NOTE: these filter IDs differ from the original signed-max-based boundary
+list (pairwise Filters 8 & 15; triplet Filters 6 & 15). The headline count
+(1-2 of 16) is similar either way, but the specific filter numbers cited
+in the text MUST match whichever criterion is stated as having been used.
+
+WHY THE 794 nm CLAIM DOES NOT SURVIVE
+--------------------------------------
+Full min/max inspection shows nearly every filter has a large NEGATIVE
+excursion in the 606-623 nm band that is LARGER IN MAGNITUDE than its
+positive bump near 794 nm. The original text's "~794 nm" cluster comes
+from taking only the signed (positive) maximum, which ignores these
+larger negative troughs. Example (pairwise Filter 1): positive max
+147.27 at 794.2 nm, but negative min -266.67 at 616.0 nm -- the true
+|activation| peak is at 616.0 nm, not 794.2 nm.
+
+Recomputing with argmax(|activation|) for all 32 filters (16 pairwise +
+16 triplet):
+  Filters with true peak in the red-edge region (>=780 nm): 0 of 16 (pairwise), 0 of 16 (triplet)
+  Filters with true peak in the 599.7-623.5 nm band:        16 of 16 (pairwise), 15 of 16 (triplet)
+  Remaining triplet filter (Filter 9): true peak at the boundary row (800.7 nm, see above).
+
+VERDICT: The ~794 nm / red-edge engagement claim does NOT survive
+criterion-correct re-analysis. Zero filters in either network have their
+true largest-magnitude activation there. It is a sign-selection artifact
+of the original signed-max method, not a real second engagement region
+(and not, strictly, a padding artifact either, since row 54 itself is a
+valid interior row) -- do not use it in the reviewer response. Rest the
+argument on the 606-623 nm onset region alone, which is supported by
+31 of 32 filters across both networks.
+
+CORRELATION: |PEAK ACTIVATION| vs CLASS-SEPARATION SCORE
+-----------------------------------------------------------
+Pairwise (Cohen's d):   r = 0.002   (previously reported r = 0.10, using signed max)
+Triplet  (eta^2):       r = -0.030  (previously reported r = -0.15, using signed max)
+Conclusion unchanged, and now even more strongly supported (both closer to zero).
+
+Strongest-separation filter per network:
+  Pairwise: Filter 10 (Cohen's d = 0.1629) -- ranks 13 of 16 by |peak activation| (low).
+  Triplet:  Filter 11 (eta^2  = 0.0876)   -- ranks 16 of 16 by |peak activation| (weakest -- exact match to "weakest by activation").
+
+FIGURES REGENERATED
+--------------------
+interpretability_figures/reverification/filter_wavelength_responses_pairwise_sharedaxis.png
+interpretability_figures/reverification/filter_wavelength_responses_triplet_sharedaxis.png
+  -- shared y-axis across all 16 panels, same panel numbering as Figures R1/R3.
+interpretability_figures/reverification/filter_wavelength_responses_pairwise_trimmed.png
+interpretability_figures/reverification/filter_wavelength_responses_triplet_trimmed.png
+  -- rows 1 and 55 excluded, plotted over the trimmed wavelength range.
+Original autoscaled R2/R4 figures kept as-is in interpretability_figures/{pairwise,triplet}/
+as a supplement.
+
+CSV PEAK TABLES
+----------------
+interpretability_figures/reverification/peak_table_pairwise.csv
+interpretability_figures/reverification/peak_table_triplet.csv
+interpretability_figures/reverification/peak_table_trimmed_pairwise.csv
+interpretability_figures/reverification/peak_table_trimmed_triplet.csv
+Columns: filter_id, peak_wavelength_nm, signed_value_at_peak, output_row_index, abs_value_at_peak

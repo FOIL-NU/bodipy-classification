@@ -1,0 +1,60 @@
+CNN Interpretability Re-Verification Summary
+=============================================
+
+=== Network: pairwise ===
+Spectral bands (H, rows): 55
+Wavelength range: 599.69 - 800.57 nm
+Sampling interval: mean 3.7200 nm, std 1.1857 nm (NOT uniform -- check wl vector)
+Row-to-wavelength mapping: wavelength(row) = wl(row), i.e. output row index r of the
+conv1 activation map (after 'same' padding, so H_out == H_in == 55) maps directly to wl(r).
+Padding confirmation (3x3 kernel, 'same' padding): only row 1 and row 55 receive a
+zero-padded neighbor (row 1 lacks a real row 0; row 55 lacks a real row 56).
+Row 54 (wl = 794.2 nm) uses only real neighboring rows (53,54,55) and is NOT a boundary row.
+
+Peak table (criterion: argmax over rows of |mean activation|) saved to interpretability_figures\reverification\peak_table_pairwise.csv
+Boundary-peaking filters (row 1 or row 55), argmax(|activation|) criterion: 2 of 16
+  Filter 13: row 1 (599.7 nm), |peak|=109.9308, rank by |peak| magnitude = 14 of 16
+  Filter 15: row 1 (599.7 nm), |peak|=71.4148, rank by |peak| magnitude = 15 of 16
+
+Trimmed re-analysis (rows 1 and 55 excluded):
+  Red-edge region defined as wl >= 725.0 nm (top quartile of axis).
+  Filters with peak in red-edge region: 0/16 untrimmed -> 0/16 trimmed.
+  No filter's untrimmed peak was at the true red-edge boundary row (row N) to begin with.
+  VERDICT: red-edge engagement (~788-794 nm) SURVIVES trimming: NO
+
+Correlation, activation magnitude vs class-separation (Cohen's d):
+  Original (signed max, as previously reported): r = 0.096
+  Recomputed (argmax|activation| criterion):     r = 0.002
+  Strongest-separation filter: Filter 10 (Cohen's d = 0.1629), rank by |peak activation| = 13 of 16
+
+Figures saved: filter_wavelength_responses_pairwise_sharedaxis.png, filter_wavelength_responses_pairwise_trimmed.png
+
+
+=== Network: triplet ===
+Spectral bands (H, rows): 55
+Wavelength range: 599.67 - 800.70 nm
+Sampling interval: mean 3.7227 nm, std 1.1873 nm (NOT uniform -- check wl vector)
+Row-to-wavelength mapping: wavelength(row) = wl(row), i.e. output row index r of the
+conv1 activation map (after 'same' padding, so H_out == H_in == 55) maps directly to wl(r).
+Padding confirmation (3x3 kernel, 'same' padding): only row 1 and row 55 receive a
+zero-padded neighbor (row 1 lacks a real row 0; row 55 lacks a real row 56).
+Row 54 (wl = 794.3 nm) uses only real neighboring rows (53,54,55) and is NOT a boundary row.
+
+Peak table (criterion: argmax over rows of |mean activation|) saved to interpretability_figures\reverification\peak_table_triplet.csv
+Boundary-peaking filters (row 1 or row 55), argmax(|activation|) criterion: 1 of 16
+  Filter 9: row 55 (800.7 nm), |peak|=163.4703, rank by |peak| magnitude = 8 of 16
+
+Trimmed re-analysis (rows 1 and 55 excluded):
+  Red-edge region defined as wl >= 725.1 nm (top quartile of axis).
+  Filters with peak in red-edge region: 1/16 untrimmed -> 0/16 trimmed.
+  1 filter(s) had untrimmed peak at row N; after trimming, 0 of 1 still land in the red-edge region.
+  VERDICT: red-edge engagement (~788-794 nm) SURVIVES trimming: NO
+
+Correlation, activation magnitude vs class-separation (eta^2):
+  Original (signed max, as previously reported): r = -0.154
+  Recomputed (argmax|activation| criterion):     r = -0.030
+  Strongest-separation filter: Filter 11 (eta^2 = 0.0876), rank by |peak activation| = 16 of 16
+
+Figures saved: filter_wavelength_responses_triplet_sharedaxis.png, filter_wavelength_responses_triplet_trimmed.png
+
+

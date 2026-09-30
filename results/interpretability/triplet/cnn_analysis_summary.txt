@@ -1,0 +1,82 @@
+CNN Weight Analysis Summary (real trained network, real held-out data)
+======================================================================
+
+Network file: //nassy/labdata/dropbox/WEIHONG/MATLAB/bodipy/validation_results/triplet_reference_net.mat
+Classes: 1, 2, 3
+Held-out samples analyzed: 366
+
+First conv layer 'conv1': 16 filters, size 3x3x1
+
+Filters ranked by peak real activation (where each filter is most ENGAGED -- NOT the same as discriminative importance, see below):
+  Filter 5: peak activation 368.4705 at 618.4 nm (corr with avg spectrum = 0.998)
+  Filter 16: peak activation 286.8143 at 794.3 nm (corr with avg spectrum = -0.997)
+  Filter 3: peak activation 280.0139 at 618.4 nm (corr with avg spectrum = 0.998)
+  Filter 10: peak activation 213.9259 at 794.3 nm (corr with avg spectrum = -0.993)
+  Filter 4: peak activation 189.9749 at 606.5 nm (corr with avg spectrum = 0.052)
+  Filter 14: peak activation 174.6967 at 794.3 nm (corr with avg spectrum = -0.991)
+  Filter 1: peak activation 158.7966 at 620.9 nm (corr with avg spectrum = 0.930)
+  Filter 8: peak activation 153.0331 at 794.3 nm (corr with avg spectrum = -0.995)
+  Filter 6: peak activation 135.4688 at 800.7 nm (corr with avg spectrum = -0.955)  [PADDED BOUNDARY -- interior peak at 601.9 nm]
+  Filter 12: peak activation 95.1955 at 794.3 nm (corr with avg spectrum = -0.994)
+  Filter 9: peak activation 86.3809 at 623.5 nm (corr with avg spectrum = 0.787)
+  Filter 13: peak activation 86.1923 at 794.3 nm (corr with avg spectrum = -0.989)
+  Filter 2: peak activation 82.6433 at 794.3 nm (corr with avg spectrum = -0.988)
+  Filter 15: peak activation 77.3404 at 800.7 nm (corr with avg spectrum = -0.966)  [PADDED BOUNDARY -- interior peak at 601.9 nm]
+  Filter 7: peak activation 71.7125 at 604.2 nm (corr with avg spectrum = -0.156)
+  Filter 11: peak activation 44.6005 at 620.9 nm (corr with avg spectrum = 0.888)
+
+Filters ranked by class-separation (eta^2) -- which filters actually distinguish the classes:
+  Filter 11: eta^2=0.0876 (peak-activation rank was 16 of 16)
+  Filter 6: eta^2=0.0868 (peak-activation rank was 9 of 16)
+  Filter 8: eta^2=0.0793 (peak-activation rank was 8 of 16)
+  Filter 15: eta^2=0.0792 (peak-activation rank was 14 of 16)
+  Filter 14: eta^2=0.0769 (peak-activation rank was 6 of 16)
+  Filter 12: eta^2=0.0732 (peak-activation rank was 10 of 16)
+  Filter 16: eta^2=0.0718 (peak-activation rank was 2 of 16)
+  Filter 10: eta^2=0.0671 (peak-activation rank was 4 of 16)
+  Filter 5: eta^2=0.0661 (peak-activation rank was 1 of 16)
+  Filter 2: eta^2=0.0647 (peak-activation rank was 13 of 16)
+  Filter 1: eta^2=0.0621 (peak-activation rank was 7 of 16)
+  Filter 13: eta^2=0.0582 (peak-activation rank was 12 of 16)
+  Filter 3: eta^2=0.0567 (peak-activation rank was 3 of 16)
+  Filter 7: eta^2=0.0558 (peak-activation rank was 15 of 16)
+  Filter 9: eta^2=0.0509 (peak-activation rank was 11 of 16)
+  Filter 4: eta^2=0.0264 (peak-activation rank was 5 of 16)
+
+Correlation between activation magnitude and class-separation across filters: r=-0.154
+(A low correlation means "most active" and "most discriminative" are different filters --
+ discrimination likely emerges from a nonlinear combination of filters, not any single one.)
+
+Direct-path (Branch 2) LOCAL LINEAR APPROXIMATION of effective weight vs wavelength
+(fc_input->fc_final composition, treating the intermediate ReLU as identity -- this is an
+approximation, NOT an exact decomposition; only the concat-channel index mapping used to
+build it is exact, verified empirically with max match residual 0):
+  1: largest-magnitude weight -3.3714 at 611.1 nm
+  2: largest-magnitude weight 11.1036 at 613.5 nm
+  3: largest-magnitude weight -6.6429 at 613.5 nm
+
+Occlusion sensitivity vs wavelength (whole network; occluded rows replaced with the ROI's own
+mean intensity, MaskValue='auto' -- verified empirically to NOT be zero; each class's map is
+averaged only over held-out samples whose TRUE label is that class, not all held-out samples;
+positive means occluding that wavelength REDUCES confidence in the class, i.e. supporting
+evidence for it, in real examples of that class):
+  1: strongest positive evidence at 606.5 nm (0.0403); strongest negative at 620.9 nm (-0.0694)
+  2: strongest positive evidence at 613.5 nm (0.0856); strongest negative at 712.0 nm (0.0006)
+  3: strongest positive evidence at 604.2 nm (0.0280); strongest negative at 716.3 nm (-0.0164)
+
+Input-gradient saliency vs wavelength (local sensitivity via backprop through the whole
+network, including the max-pool layers; conditioned on true-label samples per class, same
+as occlusion sensitivity above -- complementary to it, measuring a local derivative instead
+of a large removal perturbation):
+  1: strongest positive gradient at 716.3 nm (0.0000); strongest negative at 611.1 nm (-0.0000)
+  2: strongest positive gradient at 599.7 nm (0.0000); strongest negative at 744.0 nm (-0.0000)
+  3: strongest positive gradient at 648.4 nm (0.0000); strongest negative at 716.3 nm (-0.0000)
+  Correlation with occlusion sensitivity, per class: [0.409 0.0996 -0.0481]
+  Cross-sample cancellation ratio (abs-mean/|signed-mean|), per class: [1.89 1.9 1.67]
+    (>1 means the plotted signed average understates the typical per-sample |gradient| --
+     some of the "near-zero" appearance is samples' gradients pointing in different
+     directions and cancelling in the average, not every sample having a tiny gradient.)
+  Softmax-saturation ratio (logit-grad abs-mean / softmax-grad abs-mean), per class: [58.6 391 9.17]
+    (>1 means gradients computed through the pre-softmax logit are larger than through the
+     softmax output -- direct evidence the softmax layer itself is attenuating the signal,
+     i.e. genuine softmax saturation, rather than an assumption from magnitude alone.)

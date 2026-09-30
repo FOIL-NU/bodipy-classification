@@ -1,0 +1,39 @@
+CNN Interpretability Re-Verification -- Round 2 Summary
+==========================================================
+
+=== Network: pairwise ===
+Dual-peak table saved: dual_peak_table_pairwise.csv (pos + neg excursion per filter)
+  Filters with EITHER excursion in onset band (599-625 nm): 16 of 16
+  Filters with EITHER excursion in red-edge band (>=780 nm): 13 of 16
+  Filters with ONE excursion in onset AND the OTHER in red-edge (genuine two-region support): 13 of 16
+Onset-cluster count with boundary-peaking filters removed: 14 of 14 remaining filters peak in 599-625 nm (excluded: [13 15])
+Trimmed (rows 1 & 55 excluded) magnitude comparison, red-edge (>=770 nm, interior only) vs onset (599-625 nm):
+  Median |red-edge| max activation across filters: 127.78
+  Median |onset| max activation across filters:    245.83
+  Median ratio (red-edge / onset), per filter: 0.529  (i.e. red-edge response is typically 53% of onset response)
+  Range of per-filter ratio: 0.105 - 0.653
+Variance-normalized activation (mean_act / per-band input std): peak location shifts to onset band for 3/16 filters, red-edge for 13/16 filters
+  (Band std range across the 55 bands: 61.13 - 731.62; onset-band mean std 535.35 vs red-edge-band mean std 84.63)
+RANDOM-INIT CONTROL (30 trials x 16 untrained filters = 480 instances, He-init, same forward pass, same real ROI data):
+  Untrained-filter peaks landing in onset band (599-625 nm): 441 of 480 (91.9%)
+  Untrained-filter peaks landing in red-edge band (>=780 nm): 38 of 480 (7.9%)
+  For comparison, TRAINED filters landing in onset band: 16 of 16 (100.0%)
+
+=== Network: triplet ===
+Dual-peak table saved: dual_peak_table_triplet.csv (pos + neg excursion per filter)
+  Filters with EITHER excursion in onset band (599-625 nm): 16 of 16
+  Filters with EITHER excursion in red-edge band (>=780 nm): 12 of 16
+  Filters with ONE excursion in onset AND the OTHER in red-edge (genuine two-region support): 12 of 16
+Onset-cluster count with boundary-peaking filters removed: 15 of 15 remaining filters peak in 599-625 nm (excluded: 9)
+Trimmed (rows 1 & 55 excluded) magnitude comparison, red-edge (>=770 nm, interior only) vs onset (599-625 nm):
+  Median |red-edge| max activation across filters: 90.69
+  Median |onset| max activation across filters:    160.79
+  Median ratio (red-edge / onset), per filter: 0.576  (i.e. red-edge response is typically 58% of onset response)
+  Range of per-filter ratio: 0.079 - 0.679
+Variance-normalized activation (mean_act / per-band input std): peak location shifts to onset band for 0/16 filters, red-edge for 16/16 filters
+  (Band std range across the 55 bands: 69.30 - 854.83; onset-band mean std 631.77 vs red-edge-band mean std 98.25)
+RANDOM-INIT CONTROL (30 trials x 16 untrained filters = 480 instances, He-init, same forward pass, same real ROI data):
+  Untrained-filter peaks landing in onset band (599-625 nm): 410 of 480 (85.4%)
+  Untrained-filter peaks landing in red-edge band (>=780 nm): 67 of 480 (14.0%)
+  For comparison, TRAINED filters landing in onset band: 15 of 16 (93.8%)
+

@@ -1,0 +1,48 @@
+Descriptor-Group Comparison under a Revised Ontology, with Dimensionality Matching
+=================================================================================
+Spectral centroid is separated from width/shape descriptors: it is an intensity-weighted mean
+wavelength, i.e. a band-POSITION statistic, and grouping it with shape overstated the case for
+shape over position. Groups are compared both in full and at matched size (best single descriptor).
+
+=== pairwise: BODIPY 4/10, n = 1200, chance = 0.500 ===
+
+  Group            #feat  full group       best single descriptor       name of best
+  Peak maximum     2      0.590            0.588                        peak_position
+  Band position    1      0.694            0.694                        spectral_centroid
+  Width / shape    4      0.603            0.596                        fwhm
+  Tail             1      0.514            0.514                        red_edge_integral
+  Shoulder         2      0.631            0.570                        shoulder_position
+  ALL descriptors  10     0.735           
+
+Dimensionality control -- each group padded to 4 columns with pure Gaussian noise (20 repeats):
+  Peak maximum     0.589 +/- 0.007   (vs 0.590 unpadded)
+  Band position    0.694 +/- 0.003   (vs 0.694 unpadded)
+  Width / shape    (already 4 columns, no padding needed)
+  Tail             0.508 +/- 0.015   (vs 0.514 unpadded)
+  Shoulder         0.618 +/- 0.009   (vs 0.631 unpadded)
+
+MATCHED-SIZE VERDICT: the strongest single descriptor of any group is spectral_centroid (Band position), at 0.694.
+  Width/shape best single (fwhm, 0.596) vs peak-maximum best single (peak_position, 0.588): difference +0.008
+  Band position (centroid, 0.694) vs peak-maximum best single (0.588): difference +0.107
+
+=== triplet: BODIPY 2/11/13, n = 1830, chance = 0.333 ===
+
+  Group            #feat  full group       best single descriptor       name of best
+  Peak maximum     2      0.519            0.470                        peak_position
+  Band position    1      0.553            0.553                        spectral_centroid
+  Width / shape    4      0.493            0.482                        fwhm
+  Tail             1      0.456            0.456                        red_edge_integral
+  Shoulder         2      0.455            0.413                        shoulder_intensity
+  ALL descriptors  10     0.591           
+
+Dimensionality control -- each group padded to 4 columns with pure Gaussian noise (20 repeats):
+  Peak maximum     0.509 +/- 0.005   (vs 0.519 unpadded)
+  Band position    0.552 +/- 0.004   (vs 0.553 unpadded)
+  Width / shape    (already 4 columns, no padding needed)
+  Tail             0.451 +/- 0.005   (vs 0.456 unpadded)
+  Shoulder         0.452 +/- 0.007   (vs 0.455 unpadded)
+
+MATCHED-SIZE VERDICT: the strongest single descriptor of any group is spectral_centroid (Band position), at 0.553.
+  Width/shape best single (fwhm, 0.482) vs peak-maximum best single (peak_position, 0.470): difference +0.012
+  Band position (centroid, 0.553) vs peak-maximum best single (0.470): difference +0.083
+

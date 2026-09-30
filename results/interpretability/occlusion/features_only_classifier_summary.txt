@@ -1,0 +1,64 @@
+Features-Only Classifiers vs. the CNN, by Named Spectral Feature Group
+=======================================================================
+Stratified 5-fold CV, same dyes / photon cutoff (1000) / outlier filtering / per-dye sample sizes as the CNN validation.
+Classifiers: linear discriminant (primary) and bagged trees (guards against understating a
+feature group that is informative only nonlinearly). Both are reported; neither is tuned.
+
+=== pairwise network: BODIPY 4/10 (n = 1200 molecules) ===
+CNN reference: 5-fold CV accuracy 0.738 +/- 0.016 (from validation_results, same dyes and preprocessing)
+
+Accuracy by named feature group (mean +/- std over folds):
+  Group              #feat  linear discriminant    bagged trees          
+  Peak position      1      0.588 +/- 0.026          0.578 +/- 0.012
+  Shoulder           2      0.631 +/- 0.021          0.567 +/- 0.018
+  Band shape         6      0.702 +/- 0.026          0.714 +/- 0.025
+  Amplitude          1      0.578 +/- 0.016          0.530 +/- 0.027
+  All 10 features    10     0.735 +/- 0.012          0.730 +/- 0.013
+  (chance = 0.500)
+
+Per-feature importance within the full 10-feature set (linear discriminant):
+  Feature                alone          drop-one loss 
+  spectral_centroid      0.694          +0.0558
+  fwhm                   0.596          -0.0050
+  peak_position          0.588          +0.0050
+  peak_intensity         0.578          -0.0033
+  shoulder_position      0.570          +0.0067
+  asymmetry              0.546          +0.0042
+  shoulder_intensity     0.538          -0.0042
+  kurtosis               0.518          -0.0033
+  red_edge_integral      0.514          +0.0008
+  band_width_90          0.505          +0.0000
+  Full 10-feature accuracy: 0.735
+
+Best single named group (linear): Band shape at 0.702, vs 0.735 for all 10 features and 0.738 for the CNN.
+CNN minus all-10-features gap: +0.003 accuracy -- within about 2 CNN CV standard deviations, i.e. the named features account for most of what the CNN achieves.
+
+=== triplet network: BODIPY 2/11/13 (n = 1830 molecules) ===
+CNN reference: 5-fold CV accuracy 0.740 +/- 0.018 (from validation_results, same dyes and preprocessing)
+
+Accuracy by named feature group (mean +/- std over folds):
+  Group              #feat  linear discriminant    bagged trees          
+  Peak position      1      0.469 +/- 0.027          0.485 +/- 0.018
+  Shoulder           2      0.450 +/- 0.032          0.432 +/- 0.033
+  Band shape         6      0.591 +/- 0.034          0.627 +/- 0.025
+  Amplitude          1      0.415 +/- 0.015          0.343 +/- 0.038
+  All 10 features    10     0.584 +/- 0.032          0.636 +/- 0.026
+  (chance = 0.333)
+
+Per-feature importance within the full 10-feature set (linear discriminant):
+  Feature                alone          drop-one loss 
+  spectral_centroid      0.542          +0.0093
+  peak_position          0.469          +0.0109
+  fwhm                   0.462          +0.0027
+  red_edge_integral      0.453          -0.0049
+  kurtosis               0.436          +0.0022
+  peak_intensity         0.415          -0.0000
+  shoulder_intensity     0.394          +0.0071
+  band_width_90          0.390          -0.0044
+  asymmetry              0.372          +0.0011
+  shoulder_position      0.360          -0.0027
+  Full 10-feature accuracy: 0.584
+
+Best single named group (linear): Band shape at 0.591, vs 0.584 for all 10 features and 0.740 for the CNN.
+CNN minus all-10-features gap: +0.156 accuracy -- outside 2 CNN CV standard deviations, i.e. the CNN uses information these 10 named features do not capture.
+

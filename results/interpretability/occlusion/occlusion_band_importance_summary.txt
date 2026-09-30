@@ -1,0 +1,93 @@
+Band-Occlusion / Band-Permutation Importance (classification-based)
+====================================================================
+Primary window width: 15 nm   Secondary: 20 nm
+Random-init control trials: 30   Permutation repeats: 30   Bootstrap resamples: 5000
+
+=== Network: pairwise (dyes [4 10]) ===
+Held-out samples: 240   Classes: 2   Spectral bands: 55 (599.7-800.6 nm, ~3.72 nm mean spacing)
+Occlusion baseline (primary): per-band mean over the full filtered population of dyes [4 10] (n_photons > 1000, centroid rmoutliers 4 SD), class-balanced across dyes. Split-independent stand-in for the training-fold mean, which the saved net does not record (its imageInputLayer stores a SCALAR zerocenter mean).
+  Population vs held-out per-band mean: max abs difference 29.8 (3.2% of the population mean's own range)
+Unoccluded held-out accuracy: 0.7625 (183/240 correct); mean correct-class logit 1.5171
+
+--- Occlusion sweep, 15 nm windows, population-mean replacement ---
+Largest accuracy drop: 0.0875 (8.7 accuracy points) at 606.5 nm
+  95% bootstrap CI at that window: [0.0208, 0.1583]  (does NOT survive Bonferroni)
+Windows with a drop significant at raw 95%: 5 of 55; after Bonferroni: 0 of 55
+Random-init control: mean |Delta-accuracy| across windows 0.0021 (max 0.0075); trained-network max is 11.7x that maximum.
+  Untrained baseline accuracy across 30 trials: 0.510 +/- 0.041 (chance = 0.500) -- the control bounds sweep artifacts, not significance.
+  Untrained prediction-flip rate: mean 0.050, max 0.148 across windows (a more sensitive artifact probe than its Delta-accuracy).
+
+--- Agreement across methods and choices (Spearman rho over the 55 windows) ---
+  vs. permutation importance (no baseline value at all): rho = +0.508
+  vs. same sweep with held-out-set mean as baseline:     rho = +0.980
+  vs. same sweep with 20 nm windows:                     rho = +0.782
+
+--- Which spectral feature does the drop track? (Spearman rho) ---
+  vs. pooled mean spectral AMPLITUDE (the confound that invalidated the activation analysis): rho = +0.318
+  vs. between-class mean-intensity DIFFERENCE:                                              rho = +0.040
+  vs. |d(mean spectrum)/d(lambda)| (band-shape / edge steepness):                            rho = +0.328
+  (Amplitude and between-class difference are themselves correlated across wavelength: rho = +0.295,
+   so the plain correlations above cannot separate them. Rank PARTIAL correlations, which can:
+     drop vs. between-class difference, amplitude held constant: -0.060
+     drop vs. amplitude, between-class difference held constant: +0.320
+   The random-init control is the other half of this argument: an untrained network sees the same
+   amplitudes and shows no comparable drop, so amplitude alone does not produce the profile.
+  Class peak positions (from class-mean spectra): 613.5 621.0 nm
+  Shoulder positions: class 1: 645.4 nm (detected in 100% of molecules); class 2: 657.5 nm (detected in 100% of molecules)
+  Distance from largest-drop window to nearest class peak: 7.1 nm
+  Distance from largest-drop window to nearest detected shoulder: 38.9 nm
+
+--- Localization: is discrimination in one feature or spread over the band? ---
+  Fraction of the total accuracy drop in the top 3 windows: 0.324
+  Number of windows carrying 50% of the total drop: 5 (approx 19 nm of spectrum)
+  Interpretation threshold used: <=3 windows / <=11 nm for "localized to a single feature"; more than that reads as distributed band shape.
+
+--- Correct-class logit drop, per class ---
+  Class 0: largest mean logit drop 2.5476 at 618.4 nm
+  Class 1: largest mean logit drop 0.5768 at 654.4 nm
+
+=== Network: triplet (dyes [2 11 13]) ===
+Held-out samples: 366   Classes: 3   Spectral bands: 55 (599.7-800.7 nm, ~3.72 nm mean spacing)
+Occlusion baseline (primary): per-band mean over the full filtered population of dyes [2 11 13] (n_photons > 1000, centroid rmoutliers 4 SD), class-balanced across dyes. Split-independent stand-in for the training-fold mean, which the saved net does not record (its imageInputLayer stores a SCALAR zerocenter mean).
+  Population vs held-out per-band mean: max abs difference 24.4 (2.2% of the population mean's own range)
+Unoccluded held-out accuracy: 0.7678 (281/366 correct); mean correct-class logit -19.8201
+
+--- Occlusion sweep, 15 nm windows, population-mean replacement ---
+Largest accuracy drop: 0.2814 (28.1 accuracy points) at 611.1 nm
+  95% bootstrap CI at that window: [0.2158, 0.3443]  (survives Bonferroni across all 55 windows)
+Windows with a drop significant at raw 95%: 25 of 55; after Bonferroni: 15 of 55
+  Bonferroni-significant windows (nm): 601.9 604.2 606.5 608.8 611.1 613.5 616.0 618.4 620.9 623.5 626.1 628.7 631.4 634.1 636.9
+Random-init control: mean |Delta-accuracy| across windows 0.0029 (max 0.0123); trained-network max is 22.9x that maximum.
+  Untrained baseline accuracy across 30 trials: 0.345 +/- 0.060 (chance = 0.333) -- the control bounds sweep artifacts, not significance.
+  Untrained prediction-flip rate: mean 0.085, max 0.189 across windows (a more sensitive artifact probe than its Delta-accuracy).
+
+--- Agreement across methods and choices (Spearman rho over the 55 windows) ---
+  vs. permutation importance (no baseline value at all): rho = +0.947
+  vs. same sweep with held-out-set mean as baseline:     rho = +0.998
+  vs. same sweep with 20 nm windows:                     rho = +0.922
+
+--- Which spectral feature does the drop track? (Spearman rho) ---
+  vs. pooled mean spectral AMPLITUDE (the confound that invalidated the activation analysis): rho = +0.784
+  vs. between-class mean-intensity DIFFERENCE:                                              rho = +0.806
+  vs. |d(mean spectrum)/d(lambda)| (band-shape / edge steepness):                            rho = +0.757
+  (Amplitude and between-class difference are themselves correlated across wavelength: rho = +0.952,
+   so the plain correlations above cannot separate them. Rank PARTIAL correlations, which can:
+     drop vs. between-class difference, amplitude held constant: +0.312
+     drop vs. amplitude, between-class difference held constant: +0.094
+   The random-init control is the other half of this argument: an untrained network sees the same
+   amplitudes and shows no comparable drop, so amplitude alone does not produce the profile.
+  Class peak positions (from class-mean spectra): 613.5 620.9 620.9 nm
+  Shoulder positions: class 1: 639.7 nm (detected in 100% of molecules); class 2: 651.4 nm (detected in 100% of molecules); class 3: 651.4 nm (detected in 100% of molecules)
+  Distance from largest-drop window to nearest class peak: 2.4 nm
+  Distance from largest-drop window to nearest detected shoulder: 28.5 nm
+
+--- Localization: is discrimination in one feature or spread over the band? ---
+  Fraction of the total accuracy drop in the top 3 windows: 0.224
+  Number of windows carrying 50% of the total drop: 8 (approx 30 nm of spectrum)
+  Interpretation threshold used: <=3 windows / <=11 nm for "localized to a single feature"; more than that reads as distributed band shape.
+
+--- Correct-class logit drop, per class ---
+  Class 1: largest mean logit drop 1.4084 at 681.0 nm
+  Class 2: largest mean logit drop 13.3563 at 651.4 nm
+  Class 3: largest mean logit drop 0.2425 at 699.7 nm
+

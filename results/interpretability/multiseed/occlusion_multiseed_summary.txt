@@ -1,0 +1,33 @@
+Multi-Seed Replication of the Band-Occlusion Importance Profile
+===============================================================
+10 independently trained networks per case (fresh initialization and fresh stratified fold each).
+Occlusion window 15 nm, replaced by the per-band population mean, as in occlusion_band_importance.m.
+
+=== triplet_2_11_13: BODIPY 2/11/13 (primary result) ===
+Baseline accuracy across 10 networks: 0.725 +/- 0.024 (chance 0.333)
+Mean profile peak: 0.270 accuracy drop at 611.1 nm (across-network SD at that window 0.048)
+Per-network peak location: median 610.0 nm, range 606.5-611.1 nm
+Networks whose peak falls in 600-640 nm: 10 of 10
+Largest drop per network: median 0.286, range 0.186-0.336
+
+=== pair_1_13: BODIPY 1/13 (high-accuracy pair) ===
+Baseline accuracy across 10 networks: 0.855 +/- 0.024 (chance 0.500)
+Mean profile peak: 0.381 accuracy drop at 608.8 nm (across-network SD at that window 0.040)
+Per-network peak location: median 608.8 nm, range 604.2-611.2 nm
+Networks whose peak falls in 600-640 nm: 10 of 10
+Largest drop per network: median 0.392, range 0.317-0.454
+
+=== pair_4_10: BODIPY 4/10 (median pair (reference)) ===
+Baseline accuracy across 10 networks: 0.767 +/- 0.021 (chance 0.500)
+Mean profile peak: 0.133 accuracy drop at 611.1 nm (across-network SD at that window 0.024)
+Per-network peak location: median 608.8 nm, range 604.2-670.5 nm
+Networks whose peak falls in 600-640 nm: 9 of 10
+Largest drop per network: median 0.148, range 0.113-0.171
+
+=== pair_6_7: BODIPY 6/7 (CHANCE-LEVEL PAIR: trained negative control) ===
+Baseline accuracy across 10 networks: 0.535 +/- 0.041 (chance 0.500)
+Mean profile peak: 0.049 accuracy drop at 608.8 nm (across-network SD at that window 0.042)
+Per-network peak location: median 612.4 nm, range 604.2-626.1 nm
+Networks whose peak falls in 600-640 nm: 10 of 10
+Largest drop per network: median 0.052, range 0.029-0.108
+
